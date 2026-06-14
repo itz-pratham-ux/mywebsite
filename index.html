@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Dental Clinic | Premium Dental Care</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#0d9488', secondary: '#3b82f6' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        .loader { width: 24px; height: 24px; border: 3px solid #e2e8f0; border-radius: 50%; display: inline-block; position: relative; box-sizing: border-box; animation: rotation 1s linear infinite; }
+        .loader::after { content: ''; box-sizing: border-box; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; border-radius: 50%; border: 3px solid transparent; border-bottom-color: #0d9488; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .ripple { position: relative; overflow: hidden; }
+        .ripple::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        .ripple:active::after { width: 300px; height: 300px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <a href="#" onclick="showView('landing')" class="flex items-center space-x-2 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-primary/30 transition-shadow">
+                        <span class="text-white font-bold text-xl">L</span>
+                    </div>
+                    <span class="text-xl font-bold text-slate-800">Lumina<span class="text-primary">Dental</span></span>
+                </a>
+                <div class="hidden lg:flex items-center space-x-8" id="nav-links">
+                    <a href="#home" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Home</a>
+                    <a href="#about" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">About</a>
+                    <a href="#services" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Services</a>
+                    <a href="#doctors" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Doctors</a>
+                    <a href="#gallery" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Gallery</a>
+                    <a href="#contact" class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Contact</a>
+                </div>
+                <div class="hidden lg:flex items-center space-x-4" id="nav-auth">
+                    <button onclick="showView('login')" class="flex items-center space-x-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium">
+                        <i data-lucide="user" class="w-4 h-4"></i><span>Patient Portal</span>
+                    </button>
+                    <button onclick="showView('login')" class="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-teal-600 transition-all hover:shadow-lg hover:shadow-primary/30 text-sm font-medium ripple">
+                        <i data-lucide="shield" class="w-4 h-4"></i><span>Admin Login</span>
+                    </button>
+                </div>
+                <div class="hidden lg:flex items-center space-x-4" id="nav-logged-in" style="display: none;">
+                    <span class="text-sm text-slate-600" id="user-greeting">Welcome, User</span>
+                    <button onclick="showView('patient')" id="patient-nav-btn" class="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium" style="display: none;">
+                        <i data-lucide="calendar" class="w-4 h-4"></i><span>My Appointments</span>
+                    </button>
+                    <button onclick="showView('admin')" id="admin-nav-btn" class="flex items-center space-x-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium" style="display: none;">
+                        <i data-lucide="shield" class="w-4 h-4"></i><span>Admin</span>
+                    </button>
+                    <button onclick="logout()" class="text-sm font-medium text-slate-600 hover:text-red-500 transition-colors">Logout</button>
+                </div>
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LANDING VIEW -->
+    <div id="landing-view" class="view active">
+        <!-- Hero -->
+        <section id="home" class="relative min-h-screen flex items-center overflow-hidden pt-20">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900"></div>
+                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1920&h=1080&fit=crop')] bg-cover bg-center opacity-30"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-transparent"></div>
+            </div>
+            <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-float" style="animation-delay: 1s;"></div>
+            
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 w-full">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="gsap-hero">
+                        <div class="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6">
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                            <span class="text-white/90 text-sm font-medium">Rated #1 Premium Dental Clinic</span>
+                        </div>
+                        <h1 class="text-5xl lg:text-7xl font-bold text-white leading-tight mb-6">
+                            Your Smile Deserves <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400">Excellence</span>
+                        </h1>
+                        <p class="text-xl text-slate-300 mb-8 max-w-lg">Experience world-class dental care in a luxurious, welcoming environment. Cutting-edge technology meets compassionate expertise.</p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#contact" class="group inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all ripple">
+                                <i data-lucide="calendar" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                                <span>Book Appointment</span>
+                            </a>
+                            <a href="#services" class="inline-flex items-center space-x-3 px-8 py-4 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl font-semibold hover:bg-white/20 transition-all">
+                                <span>Our Services</span>
+                            </a>
+                        </div>
+                        <div class="flex items-center space-x-8 mt-12 pt-8 border-t border-white/10">
+                            <div><div class="text-3xl font-bold text-white">15+</div><div class="text-slate-400 text-sm">Years Experience</div></div>
+                            <div><div class="text-3xl font-bold text-white">10k+</div><div class="text-slate-400 text-sm">Happy Patients</div></div>
+                            <div><div class="text-3xl font-bold text-white">99%</div><div class="text-slate-400 text-sm">Success Rate</div></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block gsap-hero-card">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-3xl blur-2xl"></div>
+                            <div class="relative glass-dark rounded-3xl p-8 border border-white/10">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-teal-400 to-blue-500 rounded-2xl flex items-center justify-center"><i data-lucide="shield" class="w-8 h-8 text-white"></i></div>
+                                    <div><h3 class="text-white font-semibold text-lg">Premium Care</h3><p class="text-slate-400 text-sm">Certified Specialists</p></div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-3 text-slate-300"><div class="w-2 h-2 bg-teal-400 rounded-full"></div><span>Advanced Digital Imaging</span></div>
+                                    <div class="flex items-center space-x-3 text-slate-300"><div class="w-2 h-2 bg-teal-400 rounded-full"></div><span>Painless Treatment Options</span></div>
+                                    <div class="flex items-center space-x-3 text-slate-300"><div class="w-2 h-2 bg-teal-400 rounded-full"></div><span>Luxury Comfort Amenities</span></div>
+                                    <div class="flex items-center space-x-3 text-slate-300"><div class="w-2 h-2 bg-teal-400 rounded-full"></div><span>Same-Day Emergency Care</span></div>
+                                </div>
+                                <div class="mt-8 pt-6 border-t border-white/10">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex -space-x-3">
+                                            <div class="w-10 h-10 rounded-full bg-slate-600 border-2 border-slate-800 flex items-center justify-center text-xs text-white">A</div>
+                                            <div class="w-10 h-10 rounded-full bg-slate-500 border-2 border-slate-800 flex items-center justify-center text-xs text-white">B</div>
+                                            <div class="w-10 h-10 rounded-full bg-slate-400 border-2 border-slate-800 flex items-center justify-center text-xs text-white">C</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="flex items-center space-x-1 text-yellow-400 justify-end">
+                                                <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                            </div>
+                                            <p class="text-slate-400 text-sm mt-1">4.9/5 from 2,000+ reviews</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="relative gsap-fade-right">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-4">
+                                <div class="rounded-2xl overflow-hidden shadow-xl"><img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=500&fit=crop" class="w-full h-64 object-cover hover:scale-105 transition-transform duration-500" alt="Clinic"></div>
+                                <div class="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary to-secondary p-6 flex flex-col justify-center"><div class="text-4xl font-bold text-white mb-2">15+</div><div class="text-white/80">Years of Excellence</div></div>
+                            </div>
+                            <div class="space-y-4 pt-8">
+                                <div class="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 flex flex-col justify-center"><div class="text-4xl font-bold text-white mb-2">10k+</div><div class="text-white/80">Happy Smiles</div></div>
+                                <div class="rounded-2xl overflow-hidden shadow-xl"><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=400&h=500&fit=crop" class="w-full h-64 object-cover hover:scale-105 transition-transform duration-500" alt="Equipment"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gsap-fade-left">
+                        <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-50 rounded-full mb-6"><span class="text-primary text-sm font-semibold">About Our Clinic</span></div>
+                        <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Redefining the <span class="text-primary">Dental Experience</span></h2>
+                        <p class="text-lg text-slate-600 mb-8 leading-relaxed">Founded with a vision to transform dental care, Lumina Dental Clinic combines cutting-edge technology with a luxurious, welcoming environment.</p>
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="flex items-start space-x-4 p-4 rounded-xl hover:bg-slate-50 transition-colors"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="award" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Award Winning</h3><p class="text-sm text-slate-600">Top premium dental clinic for 5 consecutive years.</p></div></div>
+                            <div class="flex items-start space-x-4 p-4 rounded-xl hover:bg-slate-50 transition-colors"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="heart" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Patient First</h3><p class="text-sm text-slate-600">Personalized care plans tailored to your unique needs.</p></div></div>
+                            <div class="flex items-start space-x-4 p-4 rounded-xl hover:bg-slate-50 transition-colors"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="microscope" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Advanced Tech</h3><p class="text-sm text-slate-600">State-of-the-art digital imaging and laser equipment.</p></div></div>
+                            <div class="flex items-start space-x-4 p-4 rounded-xl hover:bg-slate-50 transition-colors"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="users" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Expert Team</h3><p class="text-sm text-slate-600">Board-certified specialists with decades of experience.</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="services" class="py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 gsap-fade-up">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-100 rounded-full mb-6"><span class="text-teal-700 text-sm font-semibold">Our Services</span></div>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Comprehensive Dental <span class="text-primary">Solutions</span></h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="services-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Doctors -->
+        <section id="doctors" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 gsap-fade-up">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-100 rounded-full mb-6"><span class="text-teal-700 text-sm font-semibold">Our Experts</span></div>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Meet Our <span class="text-primary">Specialists</span></h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="doctors-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section id="gallery" class="py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 gsap-fade-up">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-100 rounded-full mb-6"><span class="text-teal-700 text-sm font-semibold">Our Gallery</span></div>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">See Our <span class="text-primary">Clinic</span></h2>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4 mb-12" id="gallery-filters">
+                    <button onclick="filterGallery('all')" class="gallery-filter active px-6 py-2 rounded-full text-sm font-medium transition-all bg-primary text-white shadow-lg shadow-primary/30">All</button>
+                    <button onclick="filterGallery('interior')" class="gallery-filter px-6 py-2 rounded-full text-sm font-medium transition-all bg-white text-slate-600 hover:bg-slate-100">Interior</button>
+                    <button onclick="filterGallery('before-after')" class="gallery-filter px-6 py-2 rounded-full text-sm font-medium transition-all bg-white text-slate-600 hover:bg-slate-100">Before & After</button>
+                    <button onclick="filterGallery('equipment')" class="gallery-filter px-6 py-2 rounded-full text-sm font-medium transition-all bg-white text-slate-600 hover:bg-slate-100">Equipment</button>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section id="testimonials" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 gsap-fade-up">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-100 rounded-full mb-6"><span class="text-teal-700 text-sm font-semibold">Testimonials</span></div>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">What Our Patients <span class="text-primary">Say</span></h2>
+                </div>
+                <div class="relative max-w-4xl mx-auto">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30"><i data-lucide="quote" class="w-8 h-8 text-white"></i></div>
+                    <div class="relative bg-slate-50 rounded-3xl p-8 md:p-12 shadow-sm">
+                        <div id="testimonial-content" class="text-center">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 gsap-fade-up">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-teal-100 rounded-full mb-6"><span class="text-teal-700 text-sm font-semibold">Contact Us</span></div>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Get In <span class="text-primary">Touch</span></h2>
+                </div>
+                <div class="grid lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-2 space-y-6 gsap-fade-right">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-start space-x-4"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="map-pin" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Visit Us</h3><p class="text-slate-600">123 Premium Health Blvd<br>Beverly Hills, CA 90210</p></div></div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-start space-x-4"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="phone" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Call Us</h3><p class="text-slate-600">+1 (555) 123-4567</p></div></div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-start space-x-4"><div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="mail" class="w-6 h-6 text-primary"></i></div><div><h3 class="font-semibold text-slate-900 mb-1">Email Us</h3><p class="text-slate-600"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d64636b624d61786064636c696863796c61236e6260">[email&#160;protected]</a></p></div></div>
+                        <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white flex items-start space-x-4"><div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="clock" class="w-6 h-6 text-white"></i></div><div><h3 class="font-semibold mb-1">Working Hours</h3><p class="text-white/80 text-sm">Mon - Fri: 8:00 AM - 7:00 PM<br>Sat: 9:00 AM - 5:00 PM</p></div></div>
+                    </div>
+                    <div class="lg:col-span-3 gsap-fade-left">
+                        <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                            <form onsubmit="handleContactSubmit(event)" class="space-y-6">
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div><label class="block text-sm font-medium text-slate-700 mb-2">First Name</label><input type="text" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="John"></div>
+                                    <div><label class="block text-sm font-medium text-slate-700 mb-2">Last Name</label><input type="text" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Doe"></div>
+                                </div>
+                                <div><label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label><input type="email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="john@example.com"></div>
+                                <div><label class="block text-sm font-medium text-slate-700 mb-2">Message</label><textarea rows="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none" placeholder="How can we help you?"></textarea></div>
+                                <button type="submit" class="w-full flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all ripple"><i data-lucide="send" class="w-5 h-5"></i><span>Send Message</span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-4 gap-8 mb-8">
+                    <div class="md:col-span-2">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center"><span class="text-white font-bold text-xl">L</span></div>
+                            <span class="text-xl font-bold">Lumina<span class="text-teal-400">Dental</span></span>
+                        </div>
+                        <p class="text-slate-400 max-w-sm">Experience world-class dental care with cutting-edge technology and compassionate professionals.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Quick Links</h4>
+                        <ul class="space-y-2 text-slate-400">
+                            <li><a href="#about" class="hover:text-teal-400 transition-colors">About Us</a></li>
+                            <li><a href="#services" class="hover:text-teal-400 transition-colors">Services</a></li>
+                            <li><a href="#doctors" class="hover:text-teal-400 transition-colors">Our Doctors</a></li>
+                            <li><a href="#contact" class="hover:text-teal-400 transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Legal</h4>
+                        <ul class="space-y-2 text-slate-400">
+                            <li><a href="#" class="hover:text-teal-400 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-teal-400 transition-colors">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+                    <p>&copy; 2024 Lumina Dental Clinic. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="view min-h-screen bg-slate-50 flex items-center justify-center p-4 pt-24">
+        <div class="w-full max-w-md gsap-fade-up">
+            <a href="#" onclick="showView('landing')" class="inline-flex items-center space-x-2 text-slate-600 hover:text-primary transition-colors mb-8">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to Home</span>
+            </a>
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-secondary p-8 text-center">
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                        <i data-lucide="shield" class="w-8 h-8 text-white" id="login-icon"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white mb-2" id="login-title">Admin Portal</h1>
+                    <p class="text-white/80 text-sm" id="login-subtitle">Secure access for clinic administrators</p>
+                </div>
+                <div class="flex border-b border-slate-100">
+                    <button onclick="setLoginRole('patient')" id="tab-patient" class="flex-1 py-4 text-sm font-medium transition-colors text-slate-500 hover:text-slate-700">Patient Login</button>
+                    <button onclick="setLoginRole('admin')" id="tab-admin" class="flex-1 py-4 text-sm font-medium transition-colors text-primary border-b-2 border-primary bg-teal-50/50">Admin Login</button>
+                </div>
+                <form onsubmit="handleLogin(event)" class="p-8 space-y-6">
+                    <div id="login-error" class="hidden p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"></div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                            <input type="email" id="login-email" required class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="you@example.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                            <input type="password" id="login-password" required class="w-full pl-12 pr-12 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="••••••••">
+                            <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i data-lucide="eye" class="w-5 h-5" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" id="login-btn" class="w-full flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all ripple">
+                        <span>Sign In</span>
+                    </button>
+                    <div class="text-center text-sm text-slate-500" id="login-hint">
+                        Demo: <span class="font-mono text-slate-700"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2a3a6afabac82aeb7afabaca3a6a7acb6a3aeeca1adaf">[email&#160;protected]</a></span> / <span class="font-mono text-slate-700">admin123</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PATIENT PORTAL VIEW -->
+    <div id="patient-view" class="view min-h-screen bg-slate-50 pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 gsap-fade-right">
+                        <div class="text-center mb-6">
+                            <div class="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold" id="patient-avatar">J</div>
+                            <h2 class="text-xl font-bold text-slate-900" id="patient-name">John Doe</h2>
+                            <p class="text-primary text-sm">Patient</p>
+                        </div>
+                        <div class="space-y-4 mb-6">
+                            <div class="flex items-center space-x-3 text-slate-600"><i data-lucide="mail" class="w-5 h-5 text-slate-400"></i><span class="text-sm" id="patient-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4bebbbcba94b1acb5b9a4b8b1fab7bbb9">[email&#160;protected]</a></span></div>
+                            <div class="flex items-center space-x-3 text-slate-600"><i data-lucide="phone" class="w-5 h-5 text-slate-400"></i><span class="text-sm">+1 (555) 123-4567</span></div>
+                        </div>
+                        <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors">
+                            <i data-lucide="log-out" class="w-4 h-4"></i><span>Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 space-y-6 gsap-fade-left">
+                    <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div><h3 class="text-xl font-bold mb-1">Ready for your next visit?</h3><p class="text-white/80">Book an appointment with our specialists today.</p></div>
+                        <button onclick="openBookingModal()" class="flex items-center space-x-2 px-6 py-3 bg-white text-primary rounded-xl font-semibold hover:bg-slate-50 transition-colors shadow-lg">
+                            <i data-lucide="plus" class="w-5 h-5"></i><span>Book Appointment</span>
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2"><i data-lucide="history" class="w-5 h-5 text-primary"></i><span>My Appointments</span></h3>
+                        </div>
+                        <div id="patient-appointments" class="space-y-4">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PORTAL VIEW -->
+    <div id="admin-view" class="view min-h-screen bg-slate-50 pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-8">
+            <aside class="w-64 bg-white border-r border-slate-200 rounded-2xl shadow-sm p-6 hidden lg:block h-fit sticky top-24">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center"><span class="text-white font-bold">A</span></div>
+                    <div><p class="font-semibold text-slate-900">Admin Panel</p><p class="text-xs text-slate-500" id="admin-name">Dr. Sarah Mitchell</p></div>
+                </div>
+                <nav class="space-y-1">
+                    <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium bg-teal-50 text-primary"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>
+                    <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="calendar" class="w-5 h-5"></i><span>Appointments</span></button>
+                    <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="users" class="w-5 h-5"></i><span>Patients</span></button>
+                    <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50"><i data-lucide="settings" class="w-5 h-5"></i><span>Settings</span></button>
+                </nav>
+                <div class="mt-8 pt-8 border-t border-slate-100">
+                    <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i><span>Sign Out</span>
+                    </button>
+                </div>
+            </aside>
+            <main class="flex-1 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" id="admin-stats">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-bold text-slate-900">Recent Appointments</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-slate-500 border-b border-slate-100">
+                                <tr><th class="pb-3 font-medium">Patient</th><th class="pb-3 font-medium">Service</th><th class="pb-3 font-medium">Date & Time</th><th class="pb-3 font-medium">Status</th><th class="pb-3 font-medium">Actions</th></tr>
+                            </thead>
+                            <tbody id="admin-appointments" class="divide-y divide-slate-50">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- BOOKING MODAL -->
+    <div id="booking-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 gsap-fade-up">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-slate-900">Book Appointment</h3>
+                <button onclick="closeBookingModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"><i data-lucide="x-circle" class="w-5 h-5 text-slate-500"></i></button>
+            </div>
+            <form onsubmit="handleBooking(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Service</label>
+                    <select id="booking-service" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                    <input type="date" id="booking-date" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Time</label>
+                    <select id="booking-time" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                        <option>09:00 AM</option><option>10:00 AM</option><option>11:00 AM</option><option>02:00 PM</option><option>03:00 PM</option><option>04:00 PM</option>
+                    </select>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" onclick="closeBookingModal()" class="flex-1 px-4 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-medium hover:bg-teal-600 transition-colors flex items-center justify-center space-x-2">
+                        <span>Confirm Booking</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // --- DATA ---
+        const services = [
+            { name: 'Dental Checkups', desc: 'Comprehensive oral health examinations with digital X-rays.', price: '$150', icon: 'stethoscope' },
+            { name: 'Teeth Cleaning', desc: 'Professional scaling and polishing for a brighter smile.', price: '$120', icon: 'sparkles' },
+            { name: 'Teeth Whitening', desc: 'Advanced laser whitening for instant, dramatic results.', price: '$350', icon: 'sun' },
+            { name: 'Root Canal', desc: 'Painless endodontic therapy to save damaged teeth.', price: '$800', icon: 'shield' },
+            { name: 'Dental Implants', desc: 'Permanent, natural-looking tooth replacement solutions.', price: '$2,500', icon: 'crown' },
+            { name: 'Braces & Aligners', desc: 'Invisible aligners and traditional braces for perfect alignment.', price: '$4,000', icon: 'smile' }
+        ];
+
+        const doctors = [
+            { name: 'Dr. Sarah Mitchell', role: 'Lead Dentist & Founder', specialty: 'Cosmetic & Restorative Dentistry', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop', exp: '15+ years' },
+            { name: 'Dr. James Chen', role: 'Orthodontist', specialty: 'Invisible Aligners & Braces', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop', exp: '12+ years' },
+            { name: 'Dr. Emily Rodriguez', role: 'Pediatric Dentist', specialty: 'Children\'s Dental Care', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=500&fit=crop', exp: '10+ years' }
+        ];
+
+        const gallery = [
+            { url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&h=400&fit=crop', category: 'interior', desc: 'Modern Reception Area' },
+            { url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&h=400&fit=crop', category: 'before-after', desc: 'Teeth Whitening Results' },
+            { url: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=600&h=400&fit=crop', category: 'equipment', desc: 'State-of-the-art Digital X-Ray' },
+            { url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&h=400&fit=crop', category: 'interior', desc: 'Private Treatment Room' },
+            { url: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&h=400&fit=crop', category: 'before-after', desc: 'Dental Veneers Transformation' },
+            { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&h=400&fit=crop', category: 'equipment', desc: 'Advanced Sterilization Lab' }
+        ];
+
+        const testimonials = [
+            { name: 'Emily R.', role: 'Patient', content: 'The most luxurious and comfortable dental experience I have ever had. Dr. Mitchell is incredibly skilled!', rating: 5, image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop' },
+            { name: 'Michael T.', role: 'Patient', content: 'Got my teeth whitened here and the results are amazing. The advanced technology made it completely painless.', rating: 5, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop' },
+            { name: 'Sarah L.', role: 'Patient', content: 'My kids actually look forward to their dental visits now. The pediatric team is so patient and caring.', rating: 5, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop' }
+        ];
+
+        let currentUser = null;
+        let loginRole = 'admin';
+        let appointments = [
+            { id: '1', patientName: 'John Doe', service: 'Teeth Cleaning', date: '2024-02-15', time: '10:00 AM', status: 'confirmed' },
+            { id: '2', patientName: 'Jane Smith', service: 'Teeth Whitening', date: '2024-02-20', time: '02:30 PM', status: 'pending' }
+        ];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderServices();
+            renderDoctors();
+            renderGallery('all');
+            renderTestimonial(0);
+            initGSAP();
+            
+            // Check session
+            const savedUser = localStorage.getItem('lumina_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateNavForUser();
+            }
+        });
+
+        // --- RENDER FUNCTIONS ---
+        function renderServices() {
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = services.map(s => `
+                <div class="group relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 gsap-fade-up">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative">
+                        <div class="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/20">
+                            <i data-lucide="${s.icon}" class="w-7 h-7 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">${s.name}</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">${s.desc}</p>
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                            <span class="text-2xl font-bold text-primary">${s.price}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderDoctors() {
+            const grid = document.getElementById('doctors-grid');
+            grid.innerHTML = doctors.map(d => `
+                <div class="group relative bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 gsap-fade-up">
+                    <div class="relative overflow-hidden">
+                        <img src="${d.image}" alt="${d.name}" class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-slate-900 mb-1">${d.name}</h3>
+                        <p class="text-primary font-medium text-sm mb-3">${d.role}</p>
+                        <p class="text-slate-600 text-sm mb-4">${d.specialty}</p>
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+                            <div class="text-sm"><span class="text-slate-500">Experience: </span><span class="font-medium text-slate-900">${d.exp}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGallery(filter) {
+            const grid = document.getElementById('gallery-grid');
+            const filtered = filter === 'all' ? gallery : gallery.filter(g => g.category === filter);
+            grid.innerHTML = filtered.map(g => `
+                <div class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all gsap-fade-up">
+                    <img src="${g.url}" alt="${g.desc}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                        <p class="text-white font-medium">${g.desc}</p>
+                        <p class="text-white/70 text-sm capitalize">${g.category.replace('-', ' ')}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.gallery-filter').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/30');
+                btn.classList.add('bg-white', 'text-slate-600');
+                if (btn.textContent.toLowerCase().replace(' & ', '-') === filter || (filter === 'all' && btn.textContent === 'All')) {
+                    btn.classList.remove('bg-white', 'text-slate-600');
+                    btn.classList.add('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/30');
+                }
+            });
+        }
+
+        function filterGallery(category) {
+            renderGallery(category);
+        }
+
+        let currentTestimonial = 0;
+        function renderTestimonial(index) {
+            const t = testimonials[index];
+            document.getElementById('testimonial-content').innerHTML = `
+                <div class="flex justify-center mb-6">${Array(t.rating).fill('<i data-lucide="star" class="w-6 h-6 text-yellow-400 fill-yellow-400"></i>').join('')}</div>
+                <p class="text-xl md:text-2xl text-slate-700 leading-relaxed mb-8 italic">"${t.content}"</p>
+                <div class="flex items-center justify-center space-x-4">
+                    <img src="${t.image}" alt="${t.name}" class="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md">
+                    <div class="text-left">
+                        <h4 class="font-bold text-slate-900 text-lg">${t.name}</h4>
+                        <p class="text-primary">${t.role}</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center space-x-4 mt-8">
+                    <button onclick="changeTestimonial(-1)" class="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white hover:border-primary transition-all"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                    <div class="flex space-x-2">${testimonials.map((_, i) => `<button onclick="changeTestimonial(${i})" class="w-3 h-3 rounded-full transition-all ${i === index ? 'bg-primary w-8' : 'bg-slate-300'}"></button>`).join('')}</div>
+                    <button onclick="changeTestimonial(1)" class="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white hover:border-primary transition-all"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function changeTestimonial(dir) {
+            currentTestimonial = (currentTestimonial + dir + testimonials.length) % testimonials.length;
+            renderTestimonial(currentTestimonial);
+        }
+
+        // --- AUTH & NAVIGATION ---
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewName + '-view').classList.add('active');
+            window.scrollTo(0, 0);
+            lucide.createIcons();
+            
+            // Re-trigger GSAP for new view
+            setTimeout(initGSAP, 100);
+        }
+
+        function setLoginRole(role) {
+            loginRole = role;
+            document.getElementById('tab-patient').className = role === 'patient' ? 'flex-1 py-4 text-sm font-medium transition-colors text-primary border-b-2 border-primary bg-teal-50/50' : 'flex-1 py-4 text-sm font-medium transition-colors text-slate-500 hover:text-slate-700';
+            document.getElementById('tab-admin').className = role === 'admin' ? 'flex-1 py-4 text-sm font-medium transition-colors text-primary border-b-2 border-primary bg-teal-50/50' : 'flex-1 py-4 text-sm font-medium transition-colors text-slate-500 hover:text-slate-700';
+            
+            document.getElementById('login-title').textContent = role === 'admin' ? 'Admin Portal' : 'Patient Portal';
+            document.getElementById('login-subtitle').textContent = role === 'admin' ? 'Secure access for clinic administrators' : 'Access your appointments and records';
+            document.getElementById('login-icon').setAttribute('data-lucide', role === 'admin' ? 'shield' : 'user');
+            document.getElementById('login-hint').innerHTML = role === 'patient' 
+                ? 'Demo: <span class="font-mono text-slate-700">john@example.com</span> / <span class="font-mono text-slate-700">patient123</span>'
+                : 'Demo: <span class="font-mono text-slate-700">admin@luminadental.com</span> / <span class="font-mono text-slate-700">admin123</span>';
+            lucide.createIcons();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+            
+            btn.innerHTML = '<span class="loader"></span>';
+            errorDiv.classList.add('hidden');
+
+            setTimeout(() => {
+                if (loginRole === 'admin' && email === 'admin@luminadental.com' && password === 'admin123') {
+                    currentUser = { name: 'Dr. Sarah Mitchell', email: email, role: 'admin' };
+                } else if (loginRole === 'patient' && email === 'john@example.com' && password === 'patient123') {
+                    currentUser = { name: 'John Doe', email: email, role: 'patient' };
+                } else {
+                    errorDiv.textContent = 'Invalid email or password. Please try again.';
+                    errorDiv.classList.remove('hidden');
+                    btn.innerHTML = '<span>Sign In</span>';
+                    lucide.createIcons();
+                    return;
+                }
+                
+                localStorage.setItem('lumina_user', JSON.stringify(currentUser));
+                updateNavForUser();
+                showView(currentUser.role);
+                btn.innerHTML = '<span>Sign In</span>';
+                lucide.createIcons();
+            }, 800);
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('lumina_user');
+            updateNavForUser();
+            showView('landing');
+        }
+
+        function updateNavForUser() {
+            const navLinks = document.getElementById('nav-links');
+            const navAuth = document.getElementById('nav-auth');
+            const navLoggedIn = document.getElementById('nav-logged-in');
+            
+            if (currentUser) {
+                navLinks.style.display = 'none';
+                navAuth.style.display = 'none';
+                navLoggedIn.style.display = 'flex';
+                document.getElementById('user-greeting').textContent = `Welcome, ${currentUser.name}`;
+                document.getElementById('patient-nav-btn').style.display = currentUser.role === 'patient' ? 'flex' : 'none';
+                document.getElementById('admin-nav-btn').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+                
+                if (currentUser.role === 'patient') renderPatientPortal();
+                if (currentUser.role === 'admin') renderAdminPortal();
+            } else {
+                navLinks.style.display = 'flex';
+                navAuth.style.display = 'flex';
+                navLoggedIn.style.display = 'none';
+            }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('login-password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // --- PORTAL LOGIC ---
+        function renderPatientPortal() {
+            document.getElementById('patient-name').textContent = currentUser.name;
+            document.getElementById('patient-email').textContent = currentUser.email;
+            document.getElementById('patient-avatar').textContent = currentUser.name.charAt(0);
+            
+            const myAppts = appointments.filter(a => a.patientName === currentUser.name);
+            const container = document.getElementById('patient-appointments');
+            
+            if (myAppts.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-slate-500"><i data-lucide="calendar" class="w-12 h-12 mx-auto mb-4 text-slate-300"></i><p>No appointments yet. Book your first visit!</p></div>';
+            } else {
+                container.innerHTML = myAppts.map(a => `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex items-start space-x-4 mb-3 sm:mb-0">
+                            <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0"><i data-lucide="calendar" class="w-6 h-6 text-primary"></i></div>
+                            <div>
+                                <h4 class="font-semibold text-slate-900">${a.service}</h4>
+                                <div class="flex items-center space-x-4 mt-1 text-sm text-slate-500">
+                                    <span class="flex items-center space-x-1"><i data-lucide="clock" class="w-4 h-4"></i><span>${a.date} at ${a.time}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(a.status)} capitalize">${a.status}</span>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function renderAdminPortal() {
+            document.getElementById('admin-name').textContent = currentUser.name;
+            const pendingCount = appointments.filter(a => a.status === 'pending').length;
+            
+            document.getElementById('admin-stats').innerHTML = `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-4"><div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><i data-lucide="calendar" class="w-6 h-6 text-white"></i></div><span class="text-sm font-medium text-green-600">+12%</span></div>
+                    <p class="text-3xl font-bold text-slate-900 mb-1">${appointments.length}</p><p class="text-sm text-slate-500">Total Appointments</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-4"><div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center"><i data-lucide="users" class="w-6 h-6 text-white"></i></div><span class="text-sm font-medium text-green-600">+5%</span></div>
+                    <p class="text-3xl font-bold text-slate-900 mb-1">2</p><p class="text-sm text-slate-500">Total Patients</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-4"><div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center"><i data-lucide="alert-circle" class="w-6 h-6 text-white"></i></div><span class="text-sm font-medium text-red-600">-2%</span></div>
+                    <p class="text-3xl font-bold text-slate-900 mb-1">${pendingCount}</p><p class="text-sm text-slate-500">Pending Requests</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-4"><div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><i data-lucide="dollar-sign" class="w-6 h-6 text-white"></i></div><span class="text-sm font-medium text-green-600">+18%</span></div>
+                    <p class="text-3xl font-bold text-slate-900 mb-1">$12,450</p><p class="text-sm text-slate-500">Monthly Revenue</p>
+                </div>
+            `;
+
+            document.getElementById('admin-appointments').innerHTML = appointments.map(a => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-4 font-medium text-slate-900">${a.patientName}</td>
+                    <td class="py-4 text-slate-600">${a.service}</td>
+                    <td class="py-4 text-slate-600">${a.date} at ${a.time}</td>
+                    <td class="py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(a.status)} capitalize">${a.status}</span></td>
+                    <td class="py-4">
+                        ${a.status === 'pending' ? `
+                            <button onclick="updateStatus('${a.id}', 'confirmed')" class="px-3 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors mr-2">Confirm</button>
+                            <button onclick="updateStatus('${a.id}', 'cancelled')" class="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors">Cancel</button>
+                        ` : a.status === 'confirmed' ? `<button onclick="updateStatus('${a.id}', 'completed')" class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">Mark Complete</button>` : '<span class="text-slate-400 text-xs">No actions</span>'}
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function getStatusColor(status) {
+            const colors = { pending: 'bg-yellow-100 text-yellow-700', confirmed: 'bg-green-100 text-green-700', completed: 'bg-blue-100 text-blue-700', cancelled: 'bg-red-100 text-red-700' };
+            return colors[status] || 'bg-slate-100 text-slate-700';
+        }
+
+        function updateStatus(id, status) {
+            const apt = appointments.find(a => a.id === id);
+            if (apt) {
+                apt.status = status;
+                renderAdminPortal();
+                if (currentUser?.role === 'patient') renderPatientPortal();
+            }
+        }
+
+        function openBookingModal() {
+            const select = document.getElementById('booking-service');
+            select.innerHTML = services.map(s => `<option value="${s.name}">${s.name} - ${s.price}</option>`).join('');
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function handleBooking(e) {
+            e.preventDefault();
+            const newAppt = {
+                id: Date.now().toString(),
+                patientName: currentUser.name,
+                service: document.getElementById('booking-service').value,
+                date: document.getElementById('booking-date').value,
+                time: document.getElementById('booking-time').value,
+                status: 'pending'
+            };
+            appointments.push(newAppt);
+            closeBookingModal();
+            renderPatientPortal();
+            alert('Appointment booked successfully! We will confirm shortly.');
+        }
+
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            alert('Message sent successfully! We will get back to you within 24 hours.');
+            e.target.reset();
+        }
+
+        // --- GSAP ANIMATIONS ---
+        function initGSAP() {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            gsap.utils.toArray('.gsap-fade-up').forEach(el => {
+                gsap.fromTo(el, { opacity: 0, y: 30 }, {
+                    opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                });
+            });
+
+            gsap.utils.toArray('.gsap-fade-right').forEach(el => {
+                gsap.fromTo(el, { opacity: 0, x: -30 }, {
+                    opacity: 1, x: 0, duration: 0.8, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                });
+            });
+
+            gsap.utils.toArray('.gsap-fade-left').forEach(el => {
+                gsap.fromTo(el, { opacity: 0, x: 30 }, {
+                    opacity: 1, x: 0, duration: 0.8, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                });
+            });
+
+            gsap.fromTo('.gsap-hero', { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 1, ease: 'power3.out' });
+            gsap.fromTo('.gsap-hero-card', { opacity: 0, x: 50 }, { opacity: 1, x: 0, duration: 1, delay: 0.3, ease: 'power3.out' });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('glass', 'shadow-lg', 'py-3');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.remove('glass', 'shadow-lg', 'py-3');
+                nav.classList.add('py-4');
+            }
+        });
+
+        function toggleMobileMenu() {
+            // Simplified for single file: just scroll to contact or show alert
+            alert('Mobile menu: Please use desktop view for full navigation, or scroll down.');
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
